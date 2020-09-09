@@ -144,9 +144,11 @@
 #include <m8c.h>        // part specific constants and macros
 #include "PSoCAPI.h"    // PSoC API definitions for all User Modules
 #include "stdlib.h"		// Add this header to use the ftoa function
+#include "delay.h"
 
 int iData;				// Variable that stores the ADC result
 float fVolts;			// Variable that stores the converted voltage value
+float fTem;				// Variable que alacena la convercion en temperatura
 float fScaleFactor;		// Variable that stores the volts/count scale factor
 char *pResult;			// Pointer used to store the result returned by ftoa function
 int iStatus;			// Status variable for the ftoa function
@@ -156,7 +158,7 @@ void main(void)
     PGA_Start(PGA_HIGHPOWER); 			// Start PGA with Highpower
 	LCD_Start();						// Start LCD
 	LCD_Position(0,0);					// Set LCD position to row 0 column 0
-	LCD_PrCString("MEASURED VOLTAGE");	// Print string "MEASURED VOLTAGE" on LCD
+	LCD_PrCString("TEMPERATURA EN C");	// Print string "MEASURED VOLTAGE" on LCD
 	M8C_EnableGInt; 					// Enable Global Interrupts
 	ADC_Start(ADC_HIGHPOWER); 			// Start ADC by powering SC block at High Power
 	ADC_GetSamples(0); 					// Have ADC run continuously
@@ -167,9 +169,12 @@ void main(void)
 		iData=ADC_iGetData();				// Read ADC result
 		ADC_ClearFlag(); 					// Clear ADC flag
 		fVolts = fScaleFactor*(float)iData;	// Calculate voltage using ADC result and scale factor
-		pResult = ftoa(fVolts,&iStatus );	// Convernt Float value of voltage into ASCII string
+		fTem = fVolts/0.010;			// Calcula la temperatura
+		pResult = ftoa(fTem,&iStatus );	// Convernt Float value of voltage into ASCII string
 		LCD_Position(1,0);					// Set LCD position to row 1 column 0
 		LCD_PrString(pResult);				// Print voltage value on LCD
-		LCD_PrCString(" V");				// Print string " V" on LCD after voltage value
+		LCD_PrCString(" C");				// Print string " V" on LCD after voltage value
+		
+		delayms(500);
 	}
 }
